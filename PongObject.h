@@ -10,31 +10,53 @@ struct XYPosition
     float y;
 };
 
-class PongObject 
+struct XYWindowLimit
+{
+    int x;
+    int y;
+};
+
+struct XYOffset
+{
+    int x;
+    int y;
+};
+
+class PongObject
 {
 public:
     PongObject(int windowLimitX, int windowLimitY, int wallThickness);
     ~PongObject() {};
 
-    void updateDrawingObject();
-    void switchColor();
+    void UpdateDrawingObject();
+    void SwitchColor();
 
-    XYPosition* getPosition();
+    const XYPosition* GetPosition();
+    const XYWindowLimit* GetWindowLimits();
+    const XYOffset* GetOffset();
+    const SDL_Rect* GetDrawingObject();
+    std::vector<unsigned short int> GetColor();
+    int GetLength();
+    int GetThikness();
 
-    SDL_Rect* getDrawingObject();
-    std::vector<unsigned short int> getColor();
-    int getLength();
-    int getThickness();
-    void setPosition(float x, float y);
-    void setWindowLimits(int, int);
+    void SetPosition(float x, float y);
 
 protected:
-    int _windowLimitX;
-    int _windowLimitY;
-    XYPosition _position;
-    int _length;
     int _thickness;
+    int _length;
+    XYPosition _position;
+    XYWindowLimit _windowLimit;
     std::vector<unsigned short int> _color;
+    //std::vector <Color> _color;
+    
     SDL_Rect _drawingObject;
+
+    XYOffset _offset;
+
+    int offsetByX;
+    int offsetByY;
+
+    void MoveObject(float deltaTime, int objectDirection, int objectSpeed);
+    virtual void UpdateObjectPosition(float deltaTime, bool sdlKeyboardStateUp = false, bool sdlKeyBoardStateDown = false, float objectPositionX = 0.f, float objectPositionY = 0.f, int paddleLength = 0, int wallThickness = 0) = 0;
 };
 

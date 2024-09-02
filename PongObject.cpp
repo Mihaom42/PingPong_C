@@ -5,31 +5,24 @@ PongObject::PongObject(int windowLimitX, int windowLimitY, int wallThickness) :
     _thickness(wallThickness),
     _length(wallThickness),
     _position({ static_cast<float>(windowLimitX) / 2, static_cast<float>(windowLimitY) / 2 }),
-    _windowLimitX(windowLimitX),
-    _windowLimitY(windowLimitY),
+    _windowLimit({ windowLimitX , windowLimitY }),
     _color({ 255, 255, 255 })
 {
     _drawingObject.x = _position.x - static_cast<float>(_thickness) / 2;
     _drawingObject.y = _position.y - static_cast<float>(_length) / 2;
     _drawingObject.w = _thickness;
     _drawingObject.h = _length;
+
+    _offset = XYOffset();
 }
 
-void PongObject::setPosition(float x, float y)
+void PongObject::SetPosition(float x, float y)
 {
     _position.x = x;
     _position.y = y;
 }
 
-void PongObject::setWindowLimits(int windowLimitX, int windowLimitY)
-{
-    _windowLimitX = windowLimitX;
-    _windowLimitY = windowLimitY;
-}
-
-SDL_Rect* PongObject::getDrawingObject() { return &_drawingObject; }
-
-void PongObject::updateDrawingObject()
+void PongObject::UpdateDrawingObject()
 {
     _drawingObject.x = _position.x - _thickness / 2;
     _drawingObject.y = _position.y - _length / 2;
@@ -37,7 +30,7 @@ void PongObject::updateDrawingObject()
     _drawingObject.h = _length;
 }
 
-void PongObject::switchColor() {
+void PongObject::SwitchColor() {
     std::random_device fluxCapacitor;
     std::uniform_int_distribution<int> randomColor(50, 255);
     std::mt19937 randomGen(fluxCapacitor());
@@ -48,10 +41,33 @@ void PongObject::switchColor() {
     }
 }
 
-std::vector<unsigned short int> PongObject::getColor() { return _color; }
+void PongObject::MoveObject(float deltaTime, int objectDirection, int objectSpeed)
+{
+    // Implementing paddle movement and clipping position if paddle reaches window border
+    if (static_cast<int>(_position.y) + _length / 2 > _windowLimit.y)
+    {
+        _position.y = static_cast<float>(_windowLimit.y) - static_cast<float>(_length) / 2;
+    }
+    else if (static_cast<int>(_position.y) - _length / 2 < 0)
+    {
+        _position.y = 0 + static_cast<float>(_length) / 2;
+    }
+    else
+    {
+        _position.y += static_cast<float>(objectDirection) * objectSpeed * deltaTime;
+    }
+}
 
-XYPosition* PongObject::getPosition() { return &_position; }
+std::vector<unsigned short int> PongObject::GetColor() { return _color; }
 
-int PongObject::getLength() { return _length; }
+const XYPosition* PongObject::GetPosition() { return &_position; }
 
-int PongObject::getThickness() { return _thickness; }
+const XYWindowLimit* PongObject::GetWindowLimits() { return &_windowLimit; }
+
+const XYOffset* PongObject::GetOffset() { return &_offset; }
+
+const SDL_Rect* PongObject::GetDrawingObject() { return &_drawingObject; }
+
+int PongObject::GetLength() { return _length; }
+
+int PongObject::GetThikness() { return _thickness; }

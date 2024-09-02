@@ -1,22 +1,28 @@
 #include "pch.h"
 #include "Paddle.h"
 
-void Paddle::changePaddlePosition(bool sdlKeyboardStateUp, bool sdlKeyBoardStateDown, float deltaTime) {
+Paddle::Paddle(int windowLimitX, int windowLimitY, int wallThickness, float movingSpeed, int length) :
+    PongObject(windowLimitX, windowLimitY, wallThickness), _mPaddleMovingSpeed(movingSpeed), _mPaddleDirection(0) 
+{
+    _offset.x = 2;
+    _offset.y = 2;
 
-    // Implementing movement up and down for corresponding key presses
+    _length = length;
+    _position.x = static_cast<int>(_thickness / _offset.x);
+    _position.y = static_cast<int>(_windowLimit.y / _offset.y);
+} 
+
+void Paddle::UpdateObjectPosition(float deltaTime, bool sdlKeyboardStateUp, bool sdlKeyBoardStateDown, float objectPositionX, float objectPositionY, int paddleLength, int wallThickness)
+{
     _mPaddleDirection = 0;
     if (sdlKeyboardStateUp)
+    {
         _mPaddleDirection -= 1;
+    }
     if (sdlKeyBoardStateDown)
+    {
         _mPaddleDirection += 1;
+    }
 
-    // Implementing paddle movement and clipping position if paddle reaches window border
-    if (static_cast<int>(_position.y) + _length / 2 > _windowLimitY) {
-        _position.y = static_cast<float>(_windowLimitY) - static_cast<float>(_length) / 2;
-    }
-    else if (static_cast<int>(_position.y) - _length / 2 < 0) {
-        _position.y = 0 + static_cast<float>(_length) / 2;
-    }
-    else
-        _position.y += static_cast<float>(_mPaddleDirection) * _mPaddleMovingSpeed * deltaTime;
+    MoveObject(deltaTime, _mPaddleDirection, _mPaddleMovingSpeed);
 }

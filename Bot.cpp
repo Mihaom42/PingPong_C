@@ -4,16 +4,19 @@
 Bot::Bot(int windowLimitX, int windowLimitY, int wallThickness, float movingSpeed, int length) :
     PongObject(windowLimitX, windowLimitY, wallThickness), _mBotMovingSpeed(200), _mBotDirection(0)
 {
+    _offset.x = 39;
+    _offset.y = 2;
+
     _length = length;
-    _position.x = _thickness * 39;
-    _position.y = _windowLimitY / 2;
+    _position.x = _thickness * _offset.x;
+    _position.y = _windowLimit.y / _offset.y;
 }
 
-void Bot::changeBotPosition(bool sdlKeyboardStateUp, bool sdlKeyBoardStateDown, float deltaTime, float ballX, float ballY) {
-
+void Bot::UpdateObjectPosition(float deltaTime, bool sdlKeyboardStateUp, bool sdlKeyBoardStateDown, float objectPositionX, float objectPositionY, int paddleLength, int wallThickness)
+{
     _mBotDirection = 0;
 
-    float direction = ballX;
+    float direction = objectPositionX;
 
     if (direction < 0)
     {
@@ -25,17 +28,5 @@ void Bot::changeBotPosition(bool sdlKeyboardStateUp, bool sdlKeyBoardStateDown, 
         _mBotDirection += 1;
     }
 
-    // Implementing paddle movement and clipping position if paddle reaches window border
-    if (_position.y + _length / 2 > _windowLimitY)
-    {
-        _position.y = _windowLimitY - _length / 2;
-    }
-    else if (_position.y - _length / 2 < 0)
-    {
-        _position.y = 0 + _length / 2;
-    }
-    else
-    {
-        _position.y += _mBotDirection * _mBotMovingSpeed * deltaTime;
-    }
+    MoveObject(deltaTime, _mBotDirection, _mBotMovingSpeed);
 }

@@ -161,6 +161,7 @@
   <ItemGroup>
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Bot.h" />
+    <ClInclude Include="Color.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Paddle.h" />
     <ClInclude Include="pch.h" />

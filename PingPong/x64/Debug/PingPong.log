@@ -1,41 +1,42 @@
 ﻿  The vcpkg manifest was disabled, but we found a manifest file in C:\Users\HP\Desktop\PingPong_C\PingPong\. You may want to enable vcpkg manifests in your properties page or pass /p:VcpkgEnableManifest=true to the msbuild invocation.
   pch.cpp
-C:\Users\HP\Desktop\PingPong_C\PingPong\Ball.h(19,22): warning C4305: 'initializing': truncation from 'double' to 'float'
-C:\Users\HP\Desktop\PingPong_C\PingPong\Paddle.h(12,34): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\HP\Desktop\PingPong_C\PingPong\Paddle.h(13,37): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
   Ball.cpp
+C:\Users\HP\Desktop\PingPong_C\PingPong\Ball.cpp(10,18): warning C4305: 'initializing': truncation from 'double' to 'float'
   Bot.cpp
-C:\Users\HP\Desktop\PingPong_C\PingPong\Bot.cpp(8,30): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\HP\Desktop\PingPong_C\PingPong\Bot.cpp(9,33): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\HP\Desktop\PingPong_C\PingPong\Bot.cpp(31,37): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\HP\Desktop\PingPong_C\PingPong\Bot.cpp(35,25): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\HP\Desktop\PingPong_C\PingPong\Bot.cpp(11,30): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\HP\Desktop\PingPong_C\PingPong\Bot.cpp(12,34): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\HP\Desktop\PingPong_C\PingPong\Bot.cpp(31,43): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
   Game.cpp
-C:\Users\HP\Desktop\PingPong_C\PingPong\Game.cpp(138,59): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\HP\Desktop\PingPong_C\PingPong\Game.cpp(138,41): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\HP\Desktop\PingPong_C\PingPong\Game.cpp(148,59): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\HP\Desktop\PingPong_C\PingPong\Game.cpp(148,41): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\HP\Desktop\PingPong_C\PingPong\Game.cpp(213,106): warning C4244: 'argument': conversion from '_Ty' to 'Uint8', possible loss of data
+C:\Users\HP\Desktop\PingPong_C\PingPong\Game.cpp(263,107): warning C4244: 'argument': conversion from '_Ty' to 'Uint8', possible loss of data
           with
           [
               _Ty=unsigned short
           ]
-C:\Users\HP\Desktop\PingPong_C\PingPong\Game.cpp(213,84): warning C4244: 'argument': conversion from '_Ty' to 'Uint8', possible loss of data
+C:\Users\HP\Desktop\PingPong_C\PingPong\Game.cpp(263,85): warning C4244: 'argument': conversion from '_Ty' to 'Uint8', possible loss of data
           with
           [
               _Ty=unsigned short
           ]
-C:\Users\HP\Desktop\PingPong_C\PingPong\Game.cpp(213,62): warning C4244: 'argument': conversion from '_Ty' to 'Uint8', possible loss of data
+C:\Users\HP\Desktop\PingPong_C\PingPong\Game.cpp(263,63): warning C4244: 'argument': conversion from '_Ty' to 'Uint8', possible loss of data
           with
           [
               _Ty=unsigned short
           ]
+C:\Users\HP\Desktop\PingPong_C\PingPong\Game.cpp(282,66): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\HP\Desktop\PingPong_C\PingPong\Game.cpp(282,37): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\HP\Desktop\PingPong_C\PingPong\Game.cpp(283,97): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\HP\Desktop\PingPong_C\PingPong\Game.cpp(283,49): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\HP\Desktop\PingPong_C\PingPong\Game.cpp(284,85): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\HP\Desktop\PingPong_C\PingPong\Game.cpp(284,43): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
   Paddle.cpp
+C:\Users\HP\Desktop\PingPong_C\PingPong\Paddle.cpp(11,47): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\HP\Desktop\PingPong_C\PingPong\Paddle.cpp(12,51): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\HP\Desktop\PingPong_C\PingPong\Paddle.cpp(27,46): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
   PingPong.cpp
   PongObject.cpp
+C:\Users\HP\Desktop\PingPong_C\PingPong\PongObject.cpp(11,36): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
 C:\Users\HP\Desktop\PingPong_C\PingPong\PongObject.cpp(12,36): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\HP\Desktop\PingPong_C\PingPong\PongObject.cpp(13,36): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\HP\Desktop\PingPong_C\PingPong\PongObject.cpp(34,36): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\HP\Desktop\PingPong_C\PingPong\PongObject.cpp(35,36): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\HP\Desktop\PingPong_C\PingPong\PongObject.cpp(27,36): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\HP\Desktop\PingPong_C\PingPong\PongObject.cpp(28,36): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
   Generating Code...
-C:\Users\HP\Desktop\PingPong_C\PingPong\Ball.cpp(25): warning C4715: 'Ball::getRoundWinner': not all control paths return a value
   PingPong.vcxproj -> C:\Users\HP\Desktop\PingPong_C\PingPong\x64\Debug\PingPong.exe

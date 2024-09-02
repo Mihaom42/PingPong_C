@@ -9,7 +9,6 @@
 #include "Paddle.h"
 #include "Bot.h"
 
-
 class Game
 {
 public:
@@ -19,14 +18,6 @@ public:
     void ShutDownGame();
 
 private:
-    bool mIsRunning = true;
-
-
-    void ProcessInput();
-    void UpdateGame();
-    void GenerateOutput();
-    SDL_Window* mWindow;
-    SDL_Renderer* mRenderer;
     int _windowSizeX;
     int _windowSizeY;
     bool _isRightWall;
@@ -35,14 +26,41 @@ private:
     int _botScore;
     bool _colorSwap;
 
-    int* getWallThickness();
+    std::shared_ptr<Ball> _ball;
+    std::shared_ptr<Paddle> _paddle;
+    std::shared_ptr<Bot> _bot;
 
-    const Uint8* state;
+    bool _mIsRunning;
 
-    Uint32 mTicksCount;     // var to save elapsed game time
+    const Uint8* _state;
+    Uint32 _mTicksCount;    
+    Uint32 _flag;
 
-    std::shared_ptr<Ball> ball1;       // declaring ball1 as a private member of game
-    std::shared_ptr<Paddle> paddle1;   // declaring paddle1 as written above
-    std::shared_ptr<Bot> bot;
+    SDL_Window* _mWindow;
+    SDL_Renderer* _mRenderer;
+
+    Color _color;
+
+    int _x;
+    int _y;
+    int _index;
+
+private:
+    void ProcessInput();
+    void GenerateOutput();
+
+    void UpdateGame();
+    void UpdatePaddle(float deltaTime);
+    void UpdateBot(float deltaTime);
+    void UpdateBall(float deltaTime);
+    void UpdateScoreInfo();
+    void CheckOnWinner();
+
+    int GetRoundWinner(int wallThickness);
+
+    void SetColor(Uint32 r = 0, Uint32 g = 0, Uint32 b = 0, Uint32 a = 0);
+    void SetCoord(int x = 0, int y = 0);
+
+    void ResetObjectsPosition();
 };
 

@@ -1,7 +1,3 @@
-/*
- * This source file implements the procedures for the Game class.
- */
-
 #include"pch.h"
 #include "Game.h"
 
@@ -12,11 +8,27 @@ Game::Game(int windowSizeX, int windowSizeY, int paddleSize, bool isRightWall) :
     _wallThickness(15),
     _playerScore(0),
     _botScore(0),
-    _colorSwap(false),
-    ball1(new Ball(windowSizeX, windowSizeY, _wallThickness, 200.0f, 250.0f)),
-    paddle1(new Paddle(windowSizeX, windowSizeY, _wallThickness, 300.0f, paddleSize)),
-    bot(new Bot(windowSizeX, windowSizeY, _wallThickness, 300.0f, paddleSize)) 
-   {};
+    _colorSwap(false) 
+{
+    _ball = std::make_shared<Ball>(windowSizeX, windowSizeY, _wallThickness, 200.0f, 250.0f);
+    _paddle = std::make_shared<Paddle>(windowSizeX, windowSizeY, _wallThickness, 300.0f, paddleSize);
+    _bot = std::make_shared<Bot>(windowSizeX, windowSizeY, _wallThickness, 300.0f, paddleSize);
+
+    _mIsRunning = true;
+
+    _state = 0;
+    _mTicksCount = 0;
+    _flag = 0;
+
+    _mWindow = nullptr;
+    _mRenderer = nullptr;
+
+    _color = Color();
+
+    _x = 0;
+    _y = 0;
+    _index = 0;
+}
 
 bool Game::Initialize()
 {
@@ -30,10 +42,11 @@ bool Game::Initialize()
     }
 
     // Initializing game window
-    mWindow = SDL_CreateWindow("PingPong", 300, 100, _windowSizeX, _windowSizeY, 0);
+    SetCoord(300, 100);
+    _mWindow = SDL_CreateWindow("PingPong", _x, _y, _windowSizeX, _windowSizeY, _flag);
 
     // a note to window settings: x, y sets top left coordinates; w, h sets size; flags 0 - window deliberately not set to full-screen in this case.
-    if (mWindow == nullptr)
+    if (_mWindow == nullptr)
     {
         SDL_Log("Game window initialization failed! Error message: %s", SDL_GetError());
         return false;
@@ -41,17 +54,19 @@ bool Game::Initialize()
     }
 
     // Initializing renderer
-    mRenderer = SDL_CreateRenderer(mWindow, -1, 0);
-    if (mRenderer == nullptr)
+    _index = -1;
+    _mRenderer = SDL_CreateRenderer(_mWindow, _index, _flag);
+    if (_mRenderer == nullptr)
     {
         SDL_Log("Game renderer initialization failed! Error message: %s", SDL_GetError());
         return false;
     }
-
+ 
     // Setting base color of game window
-    SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
-    SDL_RenderClear(mRenderer);     // clearing back buffer to current draw color
-    SDL_RenderPresent(mRenderer);   // swap front and back buffers
+    SetColor(0, 0, 0, 255);
+    SDL_SetRenderDrawColor(_mRenderer, _color.r, _color.g, _color.b, _color.a);
+    SDL_RenderClear(_mRenderer);     // clearing back buffer to current draw color
+    SDL_RenderPresent(_mRenderer);   // swap front and back buffers
 
     return true;
 }
@@ -59,8 +74,8 @@ bool Game::Initialize()
 void Game::ShutDownGame()
 {
     // simply destroys previously created objects and quits from SDL
-    SDL_DestroyWindow(mWindow);
-    SDL_DestroyRenderer(mRenderer);
+    SDL_DestroyWindow(_mWindow);
+    SDL_DestroyRenderer(_mRenderer);
     SDL_Quit();
 }
 
@@ -68,7 +83,7 @@ void Game::GameLoop() {
 
     // Runs the main game loop in an infinite loop until mIsRunning becomes false. We have separate functions for
         // the three stages of the game loop, so this functions only calls these functions when running the loop.
-    while (mIsRunning)
+    while (_mIsRunning)
     {
         ProcessInput();
         UpdateGame();
@@ -85,27 +100,24 @@ void Game::ProcessInput()
         switch (event.type)
         {
         case SDL_QUIT:
-            mIsRunning = false;
+            _mIsRunning = false;
             break;
         }
     }
 
     // Checking for keyboard state - if Esc is pressed, game quits
-    state = SDL_GetKeyboardState(NULL);
-    if (state[SDL_SCANCODE_ESCAPE])
+    _state = SDL_GetKeyboardState(NULL);
+    if (_state[SDL_SCANCODE_ESCAPE])
     {
-        mIsRunning = false;
+        _mIsRunning = false;
     }
 }
 
 void Game::UpdateGame()
 {
-    // Guarding against too fast refresh
-    //    while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + 16));
-
     // Establishing delta time
-    float deltaTime = (SDL_GetTicks() - mTicksCount) / 1000.0f;
-    mTicksCount = SDL_GetTicks();
+    float deltaTime = (SDL_GetTicks() - _mTicksCount) / 1000.0f;
+    _mTicksCount = SDL_GetTicks();
 
     // Clipping delta time
     if (deltaTime > 0.05f)
@@ -113,108 +125,146 @@ void Game::UpdateGame()
         deltaTime = 0.05f;
     }
 
-    if (paddle1 != nullptr)
+    UpdateBall(deltaTime);
+    UpdateBot(deltaTime);
+    UpdatePaddle(deltaTime);
+    UpdateScoreInfo();
+    CheckOnWinner();
+}
+
+void Game::UpdatePaddle(float deltaTime)
+{
+    if (_paddle)
     {
-        // Handling paddle movements
-        paddle1->changePaddlePosition(state[SDL_SCANCODE_W], state[SDL_SCANCODE_S], deltaTime);
+        _paddle->UpdateObjectPosition(deltaTime, _state[SDL_SCANCODE_W], _state[SDL_SCANCODE_S]);
     }
 
-    if (bot != nullptr)
+    _paddle->UpdateDrawingObject();
+}
+
+void Game::UpdateBot(float deltaTime)
+{
+    if (_bot)
     {
-        bot->changeBotPosition(state[SDL_SCANCODE_W], state[SDL_SCANCODE_S], deltaTime, ball1->getDirection(), ball1->getPosition()->y);
+        _bot->UpdateObjectPosition(deltaTime, false, false, _ball->GetDirection());
     }
 
-    if (ball1 == nullptr)
+    _bot->UpdateDrawingObject();
+}
+
+void Game::UpdateBall(float deltaTime)
+{
+    if (_ball)
+    {
+        _ball->UpdateObjectPosition(deltaTime, false, false, _paddle->GetPosition()->y, _bot->GetPosition()->y, _paddle->GetLength(), _wallThickness);
+        _ball->SetDirection();
+    }
+
+    _ball->UpdateDrawingObject();
+}
+
+void Game::UpdateScoreInfo()
+{
+    if (GetRoundWinner(_wallThickness) == -1)
     {
         return;
     }
 
-    // Implementing ball movements
-    ball1->updatePosition(deltaTime, _wallThickness, paddle1->getPosition()->y, bot->getPosition()->y, paddle1->getLength());
-    ball1->setDirection();
-
-    if (ball1->getRoundWinner(_wallThickness) == 0)
+    if (GetRoundWinner(_wallThickness) == 0)
     {
-        ball1->setPosition(_windowSizeX / 2, _windowSizeY / 2);
-        ball1->resetVelocity();
-        _colorSwap = true;
         _botScore += 1;
-
         std::cout << "\n BOT has won this round. Score: " << _botScore << '\n';
     }
-
-    else if (ball1->getRoundWinner(_wallThickness) == 1)
+    else if (GetRoundWinner(_wallThickness) == 1)
     {
-        ball1->setPosition(_windowSizeX / 2, _windowSizeY / 2);
-        ball1->resetVelocity();
-        _colorSwap = true;
         _playerScore += 1;
-
         std::cout << "\n PLAYER has won this round. Score: " << _playerScore << '\n';
     }
 
+    ResetObjectsPosition();
+    _ball->ResetVelocity();
+    _colorSwap = true;
+}
+
+void Game::CheckOnWinner()
+{
     if (_playerScore == 5)
     {
-        mIsRunning = false;
+        _mIsRunning = false;
         std::cout << "\n PLAYER has won !!! Congrats! \n";
     }
     else if (_botScore == 5)
     {
-        mIsRunning = false;
+        _mIsRunning = false;
         std::cout << "\n This time BOT has won. Keep yourself together and try again! \n";
     }
+}
 
-    // Updating drawing objects in Paddle and Ball
-    paddle1->updateDrawingObject();
-    ball1->updateDrawingObject();
-    bot->updateDrawingObject();
+int Game::GetRoundWinner(int wallThickness)
+{
+    XYPosition ballPosition = *_ball->GetPosition();
+    XYWindowLimit windowLimit = *_ball->GetWindowLimits();
+    XYVelocity ballVelocity = *_ball->GetVelocity();
+
+    if (ballPosition.x < 0 ||
+        ballPosition.y < 0 ||
+        ballPosition.x > windowLimit.x ||
+        ballPosition.y > windowLimit.y)
+    {
+        return 0; //bot has won
+    }
+    else if (ballPosition.x >= windowLimit.x - wallThickness && ballVelocity.x > 0)
+    {
+        return 1; //player has won
+    }
+    else
+    {
+        return -1; //another case
+    }
 }
 
 void Game::GenerateOutput()
 {
-    SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 0);  // setting draw color
-    SDL_RenderClear(mRenderer);
+    SetColor();
+    SDL_SetRenderDrawColor(_mRenderer, _color.r, _color.g, _color.b, _color.a);  // setting draw color
+    SDL_RenderClear(_mRenderer);
 
-    const int thickness = 15;
     // Drawing top wall
-    SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);  // setting draw color
-    SDL_Rect wallTop{ 0, 0, _windowSizeX, thickness };
-    SDL_RenderFillRect(mRenderer, &wallTop);
+    const int thickness = 15;
+    
+    SetColor(255, 255, 255, 255);
+    SetCoord();
+    SDL_SetRenderDrawColor(_mRenderer, _color.r, _color.g, _color.b, _color.a);  // setting draw color
+    SDL_Rect wallTop{ _x, _y, _windowSizeX, thickness };
+    SDL_RenderFillRect(_mRenderer, &wallTop);
 
     // Drawing bottom wall
-    SDL_Rect wallBottom{ 0, _windowSizeY - thickness, _windowSizeX, thickness };
-    SDL_RenderFillRect(mRenderer, &wallBottom);
-
-    // Drawing right wall
-    //if (_isRightWall) 
-    //{
-    //    SDL_Rect wallRight {_windowSizeX - thickness, 0, thickness, _windowSizeY};
-    //    SDL_RenderFillRect(mRenderer, &wallRight);
-    //}
+    SDL_Rect wallBottom{ _x, _windowSizeY - thickness, _windowSizeX, thickness };
+    SDL_RenderFillRect(_mRenderer, &wallBottom);
 
     // Drawing ball and paddle
-    if (paddle1 != nullptr)
+    if (_paddle != nullptr)
     {
-        SDL_RenderFillRect(mRenderer, paddle1->getDrawingObject());
+        SDL_RenderFillRect(_mRenderer, _paddle->GetDrawingObject());
     }
 
-    if (bot != nullptr)
+    if (_bot != nullptr)
     {
-        SDL_RenderFillRect(mRenderer, bot->getDrawingObject());
+        SDL_RenderFillRect(_mRenderer, _bot->GetDrawingObject());
     }
 
     if (_colorSwap)
     {
-        ball1->switchColor();
+        _ball->SwitchColor();
     }
 
-    if (ball1 != nullptr)
+    if (_ball != nullptr)
     {
-        SDL_SetRenderDrawColor(mRenderer, ball1->getColor()[0], ball1->getColor()[1], ball1->getColor()[2], 255);
-        SDL_RenderFillRect(mRenderer, ball1->getDrawingObject());
+        SDL_SetRenderDrawColor(_mRenderer, _ball->GetColor()[0], _ball->GetColor()[1], _ball->GetColor()[2], 255);
+        SDL_RenderFillRect(_mRenderer, _ball->GetDrawingObject());
     }
 
-    SDL_RenderPresent(mRenderer);   // swap front and back buffers
+    SDL_RenderPresent(_mRenderer);   // swap front and back buffers
 
     if (_colorSwap)
     {
@@ -223,7 +273,27 @@ void Game::GenerateOutput()
     }
 }
 
-int* Game::getWallThickness()
+void Game::ResetObjectsPosition()
 {
-    return &_wallThickness;
+    XYOffset paddleOffset = *_paddle->GetOffset();
+    XYOffset botOffset = *_bot->GetOffset();
+    XYOffset ballOffset = *_ball->GetOffset();
+
+    _ball->SetPosition(_windowSizeX / ballOffset.x, _windowSizeY / ballOffset.y);
+    _paddle->SetPosition(_paddle->GetThikness() / paddleOffset.x, _paddle->GetWindowLimits()->y / paddleOffset.y);
+    _bot->SetPosition(_bot->GetThikness() * botOffset.x, _bot->GetWindowLimits()->y / botOffset.y);
+}
+
+void Game::SetCoord(int x, int y)
+{
+    _x = x;
+    _y = y;
+}
+
+void Game::SetColor(Uint32 r, Uint32 g, Uint32 b, Uint32 a)
+{
+    _color.r = r;
+    _color.g = g;
+    _color.b = b;
+    _color.a = a;
 }
