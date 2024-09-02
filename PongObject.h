@@ -47,7 +47,6 @@ protected:
     XYPosition _position;
     XYWindowLimit _windowLimit;
     std::vector<unsigned short int> _color;
-    //std::vector <Color> _color;
     
     SDL_Rect _drawingObject;
 
